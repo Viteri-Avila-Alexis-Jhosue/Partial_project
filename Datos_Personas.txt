@@ -1,0 +1,6 @@
+Nombre: Pablo Antonio,, Apellido: Campoverde,, Cedula: 1712593357
+Correo: paCampoverde1@espe.edu.ec, Contrasenia inicial: epodrevopmac,, Contrasenia: grqftgxqroce
+Nombre: Maryurid Yesica,, Apellido: Jimenez,, Cedula: 1719067595
+Correo: myJimenez@espe.edu.ec, Contrasenia inicial: zmaenemij1,, Contrasenia: bocgpgokl
+Nombre: Pablo Antonio,,,,,,, Apellido: ,,,Cadeemoprv,,,, Cedula: 1750084558
+Correo: paCampoverde@espe.edu.ec, Contrasenia inicial: epodrevopmac,,,,,,, Contrasenia: grqftgxqroce
