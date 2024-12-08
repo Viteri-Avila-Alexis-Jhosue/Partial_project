@@ -27,6 +27,7 @@ public:
     void validateId(int id);
     void validateEmail(const string& email);
     void validateCellPhone(const string& cellPhone);
+    void ingresarTelefono(string& telefono);
 };
 
 #endif

@@ -180,12 +180,12 @@ void Validation::validateId(int id) {
     while (idStr.length() < 10) idStr = "0" + idStr; // Agregar ceros iniciales si faltan
 
     if (idStr.length() != 10) {
-        throw invalid_argument("La cédula debe tener exactamente 10 dígitos.");
+        throw invalid_argument("Cedula Invalida");
     }
 
     int provincia = stoi(idStr.substr(0, 2));
     if (provincia < 1 || provincia > 24) {
-        throw invalid_argument("El código de provincia en la cédula no es válido.");
+        throw invalid_argument("Cedula Invalida");
     }
 
     int total = 0;
@@ -203,32 +203,63 @@ void Validation::validateId(int id) {
     int resultado = residuo == 0 ? 0 : 10 - residuo;
 
     if (verificador != resultado) {
-        throw invalid_argument("La cédula ingresada no es válida.");
+        throw invalid_argument("Cedula Invalida");
     }
-
-    cout << "Cédula válida." << endl;
 }
 
 void Validation::validateEmail(const string& email) {
     regex emailPattern(R"((\w+)(\.\w+)*@(\w+\.)+\w{2,})");
     if (!regex_match(email, emailPattern)) {
-        throw invalid_argument("El correo electrónico no es válido.");
+        throw invalid_argument("Correo no valido");
     }
-    cout << "Correo electrónico válido." << endl;
 }
 void Validation::validateCellPhone(const string& cellPhone) {
+    // Verifica que el número tenga 10 dígitos y que comience con '0'
     if (cellPhone.length() != 10 || cellPhone[0] != '0') {
-        throw invalid_argument("El número de teléfono debe comenzar con '0' y tener exactamente 10 dígitos.");
+        throw invalid_argument("Numero no valido");
     }
+    // Validación con expresión regular para asegurarse de que el formato es correcto
     regex phonePattern(R"(^0\d{9}$)");
     if (!regex_match(cellPhone, phonePattern)) {
-        throw invalid_argument("El número de teléfono no cumple con el formato esperado.");
+        throw invalid_argument("Numero no valido");
     }
-    cout << "Número de teléfono válido." << endl;
 }
 
 void Validation::validateCellPhone(int cellPhone) {
+    // Convierte el número entero a una cadena de texto
     string phoneStr = to_string(cellPhone);
-    while (phoneStr.length() < 10) phoneStr = "0" + phoneStr; 
+
+    // Si el número tiene menos de 10 dígitos, lo completamos con ceros a la izquierda
+    while (phoneStr.length() < 10) {
+        phoneStr = "0" + phoneStr; // Agrega ceros a la izquierda
+    }
+
+    // Llamamos a la validación de string, que ya no pierde los ceros
     validateCellPhone(phoneStr);
+}
+void Validation::ingresarTelefono(string& telefono) {
+    char c;
+    telefono.clear();  // Limpiar el teléfono al comenzar
+
+    while (telefono.length() < 10) {
+        c = getch();  // Lee un carácter desde la entrada (sin necesidad de presionar Enter)
+        
+        // Aceptamos solo números del 0 al 9
+        if (c >= '0' && c <= '9') {
+            cout << c;  // Imprime el carácter
+            telefono += c;  // Añade el número a la cadena
+        }
+        // Permitir retroceso (eliminar el último carácter ingresado)
+        else if (c == 8 && telefono.length() > 0) {
+            cout << "\b \b";  // Elimina el carácter en pantalla
+            telefono.pop_back();  // Elimina el último carácter de la cadena
+        }
+    }
+
+    // Una vez completados 10 caracteres, verificamos si es válido
+    if (telefono.length() != 10 || telefono[0] != '0') {
+        throw invalid_argument("");
+    }
+    
+    cout << endl;  // Nueva línea después de completar la entrada
 }
