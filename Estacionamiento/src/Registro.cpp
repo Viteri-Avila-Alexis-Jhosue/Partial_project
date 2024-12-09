@@ -10,6 +10,8 @@
 #include "../include/Validation.h"
 #include "../include/Nodo.h"
 #include "../include/Lista_Doble_Circular.h"
+#include "../include/Menu.h"
+#include <algorithm>
 using namespace std;
 
 Registro::Registro(std::string placa, int celda, std::string ingreso, std::string salida)
@@ -76,9 +78,41 @@ Auto Registro::registrar_por_primera_vez() {
 
     lista_auto.cargarDesdeArchivoAuto(ruta_autos);
 
-    do {
+    int opcionVehiculo;
+        Menu menu1;
+        menu1.addTitle("Seleccione una opcion");
+        menu1.addOption("Auto");
+        menu1.addOption("Moto");
+        menu1.addOption("Vehiculo pesado");
+        menu1.displayMenu();
+        opcionVehiculo = menu1.getSelectedOption();
+
+        switch (opcionVehiculo) {
+            case 0:
+                cout << "Tipo de vehiculo seleccionado: Auto\n";
+                break;
+            case 1:
+                tipo = "Moto";
+                cout << "Tipo de vehiculo seleccionado: Moto\n";
+                break;
+            case 2:
+                tipo = "Vehiculo pesado";
+                cout << "Tipo de vehiculo seleccionado: Vehiculo pesado\n";
+                break;
+            default:
+                cout << "Opcion no valida. Intente de nuevo.\n";
+                break;
+        }
+        do {
         cout << "Ingrese una placa: ";
         cin >> placa;
+
+        // Convertir las letras a mayúsculas
+        transform(placa.begin(), placa.end(), placa.begin(), ::toupper);
+
+        // Eliminar guiones de la placa
+        placa.erase(remove(placa.begin(), placa.end(), '-'), placa.end());
+
         if (!auto1.validarPlaca(placa)) {
             cout << "!!!!!!ERROR!!!!!! PLACA INCORRECTA!!!!!!!!" << endl;
         } else {
@@ -93,14 +127,12 @@ Auto Registro::registrar_por_primera_vez() {
         }
     } while (true);
 
-    cout << "Ingrese el tipo de vehiculo: ";
-    cin >> tipo;
     color = validation1.ingresarStringConEspacios("Ingrese el color de vehiculo: ");
     
     cout << "\n\t\tDatos del propietario:\t";
     nombre = validation1.ingresarStringConEspacios("\nNombre y Apellido: ");
     
-        cedula = validation1.ingresarInt("\nCedula: ");
+    cedula = validation1.ingresarInt("\nCedula: ");
     do {
         cout << "\nCorreo electronico: ";
         cin >> correo;

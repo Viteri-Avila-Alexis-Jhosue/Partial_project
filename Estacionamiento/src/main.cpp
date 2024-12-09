@@ -17,6 +17,7 @@
 #include <ctime>  // Para el manejo de fechas y horas
 
 int main() {
+    int indice = 0; 
     int opcion;
     Menu menu;
     Lista_Doble_Circular<Auto> lista_auto;
@@ -34,6 +35,9 @@ int main() {
     std::string ruta_autos = std::filesystem::current_path().string() + "/output/Autos.txt";
     std::string ruta_clientes = std::filesystem::current_path().string() + "/output/Clientes.txt";
     std::string ruta_historial = std::filesystem::current_path().string() + "/output/Historial.txt";
+
+    // Crear un parqueadero con casillas
+    Parqueadero parqueadero(10);  // 10 casillas por ejemplo
 
     do {
         menu.displayMenu();
@@ -79,7 +83,10 @@ int main() {
 
                     Archivo archivo;
                     archivo.guardarDatosEnArchivo(ruta_historial, placa + "," + fechaIngreso);
-                    std::cout << "Ingreso registrado para el vehículo con placa: " << placa << "\n";
+                    std::cout << "Ingreso registrado para el vehiculo con placa: " << placa << "\n";
+                    
+                    // Marcar la casilla ocupada en el parqueadero
+                    parqueadero.marcarCasillaOcupada(indice);
                 } else {
                     std::cout << "Placa no registrada. Por favor registre su auto por primera vez.\n";
                 }
@@ -87,7 +94,6 @@ int main() {
             }
             case 1: {  
                 Registro registro1;
-                printf("Paso");
                 Auto nuevoAuto;
                 nuevoAuto = registro1.registrar_por_primera_vez();
                 lista_auto.insertar(nuevoAuto);
@@ -99,7 +105,7 @@ int main() {
                 break;
             }
             case 2:  // Regresar
-                std::cout << "Volviendo al menú principal...\n";
+                std::cout << "Volviendo al menu principal...\n";
                 break;
             default:
                 std::cout << "Opción no valida.\n";
@@ -108,7 +114,7 @@ int main() {
             break;
         }
         case 1: {  // Registrar salida
-            std::cout << "Registrar salida seleccionado.\nIngrese la placa del vehículo: ";
+            std::cout << "Registrar salida seleccionado.\nIngrese la placa del vehiculo: ";
             std::string placa;
             std::cin >> placa;
 
@@ -117,7 +123,7 @@ int main() {
 
             if (registroNodo) {
                 if (!registroNodo->getDato().getSalida().empty()) {  // Ahora es una cadena
-                    std::cout << "El vehículo ya tiene una salida registrada.\n";
+                    std::cout << "El vehiculo ya tiene una salida registrada.\n";
                 } else {
                     // Obtener la hora de salida en formato de cadena
                     std::time_t salida = std::time(0);
@@ -131,15 +137,18 @@ int main() {
                     Archivo archivo;
                     archivo.guardarDatosEnArchivo(ruta_historial, placa + ",SALIDA," + fechaSalida);
                     std::cout << "Salida registrada exitosamente.\n";
+                    
+                    // Marcar la casilla como libre
+                    parqueadero.marcarCasillaLibre(indice);
                 }
             } else {
-                std::cout << "No se encontró un registro asociado a la placa ingresada.\n";
+                std::cout << "No se encontro un registro asociado a la placa ingresada.\n";
             }
             break;
         }
         case 2: {  // Ver historial
             Menu menuHistorial;
-            menuHistorial.addTitle("Seleccione una opción:");
+            menuHistorial.addTitle("Seleccione una opcion:");
             menuHistorial.addOption("Por rango de fechas");
             menuHistorial.addOption("Por auto");
             menuHistorial.addOption("Regresar");
@@ -148,24 +157,53 @@ int main() {
             int opcionHistorial = menuHistorial.getSelectedOption();
             if (opcionHistorial == 0) {
                 // Historial por rango de fechas
+                std::string fechaInicio, fechaFin;
+                std::cout << "Ingrese fecha de inicio (YYYY-MM-DD): ";
+                std::cin >> fechaInicio;
+                std::cout << "Ingrese fecha de fin (YYYY-MM-DD): ";
+                std::cin >> fechaFin;
+
+                // Filtrar los registros en el rango de fechas
+                lista_registro.cargarDesdeArchivoRegistro(ruta_historial);
+                lista_registro.mostrarPorRangoFechas(fechaInicio, fechaFin);
             } else if (opcionHistorial == 1) {
                 // Historial por auto
+                std::string placa;
+                std::cout << "Ingrese la placa del vehiculo: ";
+                std::cin >> placa;
+
+                lista_registro.cargarDesdeArchivoRegistro(ruta_historial);
+                lista_registro.mostrarPorPlaca(placa);
             } else {
-                std::cout << "Volviendo al menú principal...\n";
+                std::cout << "Volviendo al menu principal...\n";
             }
             break;
         }
-        case 3:
-            std::cout << "Buscar auto en el parqueadero seleccionado.\n";
+        case 3: {  // Buscar auto en el parqueadero
+            std::string placa;
+            std::cout << "Ingrese la placa del vehiculo: ";
+            std::cin >> placa;
+
+            lista_auto.cargarDesdeArchivoAuto(ruta_autos);
+            Nodo<Auto>* autoBuscado = lista_auto.buscarPorPlaca(placa);
+
+            if (autoBuscado) {
+                std::cout << "El auto con placa " << placa << " esta en el parqueadero.\n";
+            } else {
+                std::cout << "El auto no esta registrado en el parqueadero.\n";
+            }
             break;
-        case 4:
-            std::cout << "Ver parqueadero seleccionado.\n";
+        }
+        case 4: {  // Ver parqueadero
+            std::cout << "Estado actual del parqueadero:\n";
+            parqueadero.mostrarEstado();  // Mostrar el estado del parqueadero
             break;
+        }
         case 5:
             std::cout << "Saliendo del sistema...\n";
             break;
         default:
-            std::cout << "Opción no válida. Intentelo de nuevo.\n";
+            std::cout << "Opción no valida. Intentelo de nuevo.\n";
             break;
         }
 

@@ -18,17 +18,17 @@ Auto::Auto(const std::string& placa, const Persona& conductor, const std::string
       color(color.empty() ? "UNKNOWN" : color) {
     // Validación de placa
     if (placa.empty()) {
-        throw std::invalid_argument("La placa no puede estar vacía.");
+        throw std::invalid_argument("La placa no puede estar vacia.");
     }
     
     // Validación de tipo
     if (tipo.empty()) {
-        throw std::invalid_argument("El tipo no puede estar vacío.");
+        throw std::invalid_argument("El tipo no puede estar vacio.");
     }
     
     // Validación de color
     if (color.empty()) {
-        throw std::invalid_argument("El color no puede estar vacío.");
+        throw std::invalid_argument("El color no puede estar vacio.");
     }
 }
 
@@ -54,7 +54,7 @@ void Auto::setPlaca(const string& placa) {
     if (validarPlaca(placa)) {
         this->placa = placa;
     } else {
-        cout << "Placa no válida. Intente nuevamente." << endl;
+        cout << "Placa no valida. Intente nuevamente." << endl;
     }
 }
 

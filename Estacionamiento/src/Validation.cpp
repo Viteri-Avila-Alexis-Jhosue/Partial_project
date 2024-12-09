@@ -183,7 +183,7 @@ void Validation::validateId(std::string idStr) {
     size_t end = idStr.find_last_not_of(' ');
 
     if (start == std::string::npos || end == std::string::npos) {
-        throw std::invalid_argument("Cédula Inválida: no se proporcionó una cédula válida");
+        throw std::invalid_argument("Cédula Invalida: no se proporcionó una cedula válida");
     }
 
     idStr = idStr.substr(start, end - start + 1); // Limitar la cadena a la parte relevante

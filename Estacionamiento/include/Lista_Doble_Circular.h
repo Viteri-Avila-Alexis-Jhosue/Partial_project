@@ -218,6 +218,32 @@ void cargarDesdeArchivoRegistro(const std::string& rutaArchivo) {
 
     return nullptr; // Si no se encontró ningún nodo con esa placa
 }
+// Método para mostrar registros por rango de fechas
+void mostrarPorRangoFechas(const std::string& fechaInicio, const std::string& fechaFin) {
+        Nodo<Registro>* temp = cabeza;  // Cambiar primero por cabeza
+        while (temp != nullptr) {
+            Registro registro = temp->getDato();
+            if (registro.getIngreso() >= fechaInicio && registro.getIngreso() <= fechaFin) {
+                std::cout << registro.toString() << std::endl;
+            }
+            temp = temp->getSiguiente();
+            if (temp == cabeza) break;  // Condición para evitar bucle infinito en lista circular
+        }
+    }
+
+    // Método para mostrar registros por placa
+    void mostrarPorPlaca(const std::string& placa) {
+        Nodo<Registro>* temp = cabeza;  // Cambiar primero por cabeza
+        while (temp != nullptr) {
+            Registro registro = temp->getDato();
+            if (registro.getPlaca() == placa) {
+                std::cout << registro.toString() << std::endl;
+            }
+            temp = temp->getSiguiente();
+            if (temp == cabeza) break;  // Condición para evitar bucle infinito en lista circular
+        }
+    }
+
 
 };
 

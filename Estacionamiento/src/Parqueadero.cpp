@@ -8,7 +8,10 @@ using namespace std;
 Parqueadero::Parqueadero() {
     celdas.resize(CAPACIDAD_TOTAL, nullptr); // Inicializa las celdas como vacías (nullptr)
 }
-
+// Constructor con cantidad de celdas
+Parqueadero::Parqueadero(int cantidad) {
+    celdas.resize(cantidad, nullptr); // Inicializa las celdas como vacías (nullptr)
+}
 
 // Ver historial
 vector<string> Parqueadero::verHistorial() const {
@@ -48,4 +51,24 @@ int Parqueadero::consultarDisponibilidad() const {
         }
     }
     return disponibles;
+}
+// Método para marcar una casilla como ocupada
+void Parqueadero::marcarCasillaOcupada(int indice) {
+    if (indice >= 0 && indice < CAPACIDAD_TOTAL && celdas[indice] == nullptr) {
+        // Aquí asumes que un auto debe ser colocado en la celda
+        celdas[indice] = new Auto();  // Aquí deberías inicializar el auto apropiadamente
+    }
+}
+
+// Método para marcar una casilla como libre
+void Parqueadero::marcarCasillaLibre(int indice) {
+    if (indice >= 0 && indice < CAPACIDAD_TOTAL && celdas[indice] != nullptr) {
+        delete celdas[indice];  // Elimina el auto de la celda
+        celdas[indice] = nullptr;
+    }
+}
+
+// Método para mostrar el estado del parqueadero (similar a 'verParqueadero')
+void Parqueadero::mostrarEstado() const {
+    verParqueadero();  // Usa el método ya definido para mostrar el estado
 }
