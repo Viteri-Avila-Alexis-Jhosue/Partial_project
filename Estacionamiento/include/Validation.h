@@ -24,7 +24,7 @@ public:
     string ingresarString(const char* msj);
     string ingresarStringConEspacios(const char* msj);
     void validateCellPhone(int cellPhone);
-    void validateId(int id);
+    void validateId(string idStr);
     void validateEmail(const string& email);
     void validateCellPhone(const string& cellPhone);
     void ingresarTelefono(string& telefono);

@@ -6,11 +6,31 @@ using namespace std;
 
 // Constructor por defecto
 Auto::Auto()
-    : placa(""), conductor(Persona()), tipo(""), color("") {}
+    : placa("UNKNOWN"),
+      conductor(Persona("Conductor Predeterminado", "1234567890","ajv@a.e","s","0983785507","2004-02-02")),
+      tipo("UNKNOWN"),
+      color("UNKNOWN") {}
 
-// Constructor parametrizado
-Auto::Auto(const string& placa, const Persona& conductor, const string& tipo, const string& color)
-    : placa(placa), conductor(conductor), tipo(tipo), color(color) {}
+Auto::Auto(const std::string& placa, const Persona& conductor, const std::string& tipo, const std::string& color)
+    : placa(placa.empty() ? "UNKNOWN" : placa), 
+      conductor(conductor), 
+      tipo(tipo.empty() ? "UNKNOWN" : tipo), 
+      color(color.empty() ? "UNKNOWN" : color) {
+    // Validación de placa
+    if (placa.empty()) {
+        throw std::invalid_argument("La placa no puede estar vacía.");
+    }
+    
+    // Validación de tipo
+    if (tipo.empty()) {
+        throw std::invalid_argument("El tipo no puede estar vacío.");
+    }
+    
+    // Validación de color
+    if (color.empty()) {
+        throw std::invalid_argument("El color no puede estar vacío.");
+    }
+}
 
 // Getters
 string Auto::getPlaca() const {

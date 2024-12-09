@@ -7,7 +7,7 @@ using namespace std;
 class Persona {
 private:
     string nombre;
-    int cedula;
+    string cedula;
     string correo;
     string direccion;
     int edad;
@@ -19,11 +19,11 @@ public:
     Persona();
 
     // Constructor parametrizado
-    Persona(string nombre, int cedula, string correo, string direccion, string telefono, string fechaNacimiento);
+    Persona(string nombre, string cedula, string correo, string direccion, string telefono, string fechaNacimiento);
 
     // Getters
     string getNombre() const;
-    int getCedula() const;
+    string getCedula() const;
     string getCorreo() const;
     string getDireccion() const;
     int getEdad() const;
@@ -32,7 +32,7 @@ public:
 
     // Setters
     void setNombre(const string& nombre);
-    void setCedula(int cedula);
+    void setCedula(string cedula);
     void setCorreo(const string& correo);
     void setDireccion(const string& direccion);
     void setEdad(int edad);
@@ -41,8 +41,8 @@ public:
 
     // Método para calcular la edad
     int calcularEdad(const string& fechaNacimiento);
-
      std::string toString() const;
+
 };
 
 #endif // PERSONA_H

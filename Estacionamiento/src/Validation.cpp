@@ -17,6 +17,8 @@ NRC:  1978
 #include <cmath>
 #include <vector> 
 #include "../include/Validation.h"
+#include <algorithm> // Para std::remove_if
+#include <cctype>    // Para std::isdigit
 
 using namespace std;
 
@@ -174,39 +176,30 @@ string Validation::ingresarStringConEspacios(const char* msj) {
     delete[] cad;  
     return cadena1;  
 }
-void Validation::validateId(int id) {
-    string idStr = to_string(id);
 
-    while (idStr.length() < 10) idStr = "0" + idStr; // Agregar ceros iniciales si faltan
+void Validation::validateId(std::string idStr) {
+    // Eliminar los espacios al principio y al final de la cadena
+    size_t start = idStr.find_first_not_of(' ');
+    size_t end = idStr.find_last_not_of(' ');
 
+    if (start == std::string::npos || end == std::string::npos) {
+        throw std::invalid_argument("Cédula Inválida: no se proporcionó una cédula válida");
+    }
+
+    idStr = idStr.substr(start, end - start + 1); // Limitar la cadena a la parte relevante
+
+    // Verificar que la longitud sea exactamente 10 caracteres
     if (idStr.length() != 10) {
-        throw invalid_argument("Cedula Invalida");
+        throw std::invalid_argument("Cédula Inválida: debe tener exactamente 10 caracteres");
     }
 
-    int provincia = stoi(idStr.substr(0, 2));
-    if (provincia < 1 || provincia > 24) {
-        throw invalid_argument("Cedula Invalida");
-    }
-
-    int total = 0;
-    for (int i = 0; i < 9; i++) {
-        int digit = idStr[i] - '0';
-        if (i % 2 == 0) { // Posiciones impares
-            digit *= 2;
-            if (digit > 9) digit -= 9;
+    // Verificar que todos los caracteres sean dígitos
+    for (char c : idStr) {
+        if (!std::isdigit(c)) {
+            throw std::invalid_argument("Cédula Inválida: solo se permiten dígitos");
         }
-        total += digit;
-    }
-
-    int verificador = idStr[9] - '0';
-    int residuo = total % 10;
-    int resultado = residuo == 0 ? 0 : 10 - residuo;
-
-    if (verificador != resultado) {
-        throw invalid_argument("Cedula Invalida");
     }
 }
-
 void Validation::validateEmail(const string& email) {
     regex emailPattern(R"((\w+)(\.\w+)*@(\w+\.)+\w{2,})");
     if (!regex_match(email, emailPattern)) {

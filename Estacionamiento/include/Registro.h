@@ -1,48 +1,40 @@
 #ifndef REGISTRO_H
 #define REGISTRO_H
 
-#include "Persona.h"
-#include "Auto.h"
 #include <string>
-#include <ctime>
+#include <sstream>
+#include <iomanip>
+#include <vector>
+#include "Auto.h"
 
 class Registro {
 private:
-    std::string placa;      // Placa del auto
+    string placa;      // Placa del auto
     int celda;              // Número de celda ocupada
-    std::string tipo;       // Tipo de auto
-    Persona propietario;    // Propietario del auto
-    std::time_t ingreso;    // Hora de ingreso
-    std::time_t salida;     // Hora de salida (opcional)
+    string ingreso;    // Fecha y hora de ingreso (formato string)
+    string salida;     // Fecha y hora de salida (formato string)
 
 public:
     // Constructor
-    Registro(std::string placa, int celda, std::string tipo, Persona propietario, std::time_t ingreso);
+    Registro(string placa, int celda, string ingreso, string salida);
     Registro();
-    // Getters y Setters
-    std::string getPlaca() const;
-    void setPlaca(std::string placa);
+    
+    string getPlaca() const;
+    void setPlaca(string placa);
 
     int getCelda() const;
     void setCelda(int celda);
 
-    std::string getTipo() const;
-    void setTipo(std::string tipo);
+    string getIngreso() const;
+    void setIngreso(string ingreso);
 
-    Persona getPropietario() const;
-    void setPropietario(Persona propietario);
+    string getSalida() const;
+    void setSalida(string salida);
 
-    std::time_t getIngreso() const;
-    void setIngreso(std::time_t ingreso);
-
-    std::time_t getSalida() const;
-    void setSalida(std::time_t salida);
-
-    Auto registrar_por_primera_vez();
-
-    void registrar_ingreso(Auto auto1);
+    void registrar_ingreso(Auto auto1);  // Método para registrar el ingreso de un auto
     void registrar_salida(Auto auto1);
-    std::string toString() const;
+    string toString() const;
+    Auto registrar_por_primera_vez();
 };
 
 #endif // REGISTRO_H

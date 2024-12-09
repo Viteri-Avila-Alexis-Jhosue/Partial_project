@@ -2,14 +2,16 @@
 #include <iostream>
 #include <sstream>
 #include <ctime>
+#include <string>
+#include <fstream>
 using namespace std;
 
 // Constructor por defecto
 Persona::Persona()
-    : nombre(""), cedula(0), correo(""), direccion(""), edad(0), telefono(""), fechaNacimiento("") {}
+    : nombre("sdasda"), cedula("dasdasd"), correo("asd"), direccion("ads"), edad(2), telefono("3435345"), fechaNacimiento("312313") {}
 
 // Constructor parametrizado
-Persona::Persona(string nombre, int cedula, string correo, string direccion, string telefono, string fechaNacimiento)
+Persona::Persona(string nombre, string cedula, string correo, string direccion, string telefono, string fechaNacimiento)
     : nombre(nombre), cedula(cedula), correo(correo), direccion(direccion), telefono(telefono), fechaNacimiento(fechaNacimiento) {
     this->edad = calcularEdad(fechaNacimiento); // Calcula la edad automáticamente
 }
@@ -19,7 +21,7 @@ string Persona::getNombre() const {
     return nombre;
 }
 
-int Persona::getCedula() const {
+std::string Persona::getCedula() const {
     return cedula;
 }
 
@@ -48,7 +50,7 @@ void Persona::setNombre(const string& nombre) {
     this->nombre = nombre;
 }
 
-void Persona::setCedula(int cedula) {
+void Persona::setCedula(string cedula) {
     this->cedula = cedula;
 }
 

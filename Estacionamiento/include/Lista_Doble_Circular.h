@@ -2,11 +2,17 @@
 #define LISTA_DOBLE_CIRCULAR_H
 
 #include <iostream>
-#include <fstream>
+#include <stdexcept>
+#include <ctime>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <iomanip> 
 #include "Celda.h"      
 #include "Registro.h"
 #include "Nodo.h"
+#include "Persona.h"
+#include "Auto.h"
 
 template <typename T>
 class Lista_Doble_Circular {
@@ -29,11 +35,9 @@ public:
         } while (actual != cabeza);
     }
 
-    // Métodos básicos
-    void insertar(T dato) {
+    void insertar(const T& dato) {
         Nodo<T>* nuevoNodo = new Nodo<T>(dato);
-
-        if (!cabeza) {  // Si la lista está vacía
+        if (!cabeza) {
             cabeza = nuevoNodo;
             cola = nuevoNodo;
             cabeza->setSiguiente(cabeza);
@@ -47,105 +51,174 @@ public:
         }
     }
 
-    void eliminar(int posicion) {
-        if (!cabeza) return;
-
-        Nodo<T>* actual = cabeza;
-        int contador = 0;
-
-        do {
-            if (contador == posicion) {
-                if (actual == cabeza) {
-                    cabeza = cabeza->getSiguiente();
-                }
-                if (actual == cola) {
-                    cola = cola->getAnterior();
-                }
-                actual->getAnterior()->setSiguiente(actual->getSiguiente());
-                actual->getSiguiente()->setAnterior(actual->getAnterior());
-                delete actual;
-                return;
-            }
-            actual = actual->getSiguiente();
-            contador++;
-        } while (actual != cabeza);
+    // Función para cargar datos desde archivo
+void cargarDesdeArchivoRegistro(const std::string& rutaArchivo) {
+    std::ifstream archivo(rutaArchivo);
+    if (!archivo.is_open()) {
+        throw std::runtime_error("No se pudo abrir el archivo: " + rutaArchivo);
     }
 
-    void recorrer() {
-        if (!cabeza) {
-            std::cout << "La lista está vacía." << std::endl;
-            return;
+    std::string linea;
+    while (getline(archivo, linea)) {
+        std::istringstream stream(linea);
+        Registro registro;
+
+        // Leer los atributos de Registro
+        size_t pos = linea.find(',');
+        registro.setPlaca(linea.substr(0, pos));
+        linea.erase(0, pos + 1);
+
+        pos = linea.find(',');
+        registro.setCelda(stoi(linea.substr(0, pos)));
+        linea.erase(0, pos + 1);
+
+        pos = linea.find(',');
+        std::string fechaIngreso = linea.substr(0, pos);
+        linea.erase(0, pos + 1);
+        registro.setIngreso(fechaIngreso);  // Guardar como string
+
+        // Leer la fecha y hora de salida (si existe)
+        pos = linea.find(',');
+        std::string fechaSalida = linea.substr(0, pos);
+        linea.erase(0, pos + 1);
+
+        // Si hay fecha de salida, se asigna como string, de lo contrario se asigna una cadena vacía
+        if (!fechaSalida.empty()) {
+            registro.setSalida(fechaSalida);  // Guardar como string
+        } else {
+            registro.setSalida("");  // Asignar una cadena vacía si no hay fecha de salida
         }
 
-        Nodo<T>* actual = cabeza;
-        do {
-            std::cout << actual->getDato() << std::endl;
-            actual = actual->getSiguiente();
-        } while (actual != cabeza);
+        // Insertar el registro en la lista
+        insertar(registro);
     }
 
-    void cargarDesdeArchivo(const std::string& nombreArchivo) {
-        std::ifstream archivo(nombreArchivo);
+    archivo.close();
+}
+
+
+    void cargarDesdeArchivoPersona(const std::string& rutaArchivo) {
+        std::ifstream archivo(rutaArchivo);
         if (!archivo.is_open()) {
-            std::cerr << "Error al abrir el archivo." << std::endl;
-           
+            throw std::runtime_error("No se pudo abrir el archivo: " + rutaArchivo);
         }
 
-        T dato;
-        while (archivo >> dato) {
-            insertar(dato);
+        std::string linea;
+        while (getline(archivo, linea)) {
+            std::istringstream stream(linea);
+            Persona persona;
+
+            // Dividir los datos por comas y asignar a los atributos de Persona
+            size_t startPos = 0;
+            size_t commaPos = linea.find(',');
+
+            persona.setNombre(linea.substr(startPos, commaPos - startPos));
+            startPos = commaPos + 1;
+
+            commaPos = linea.find(',', startPos);
+            persona.setCedula(linea.substr(startPos, commaPos - startPos));
+            startPos = commaPos + 1;
+
+            commaPos = linea.find(',', startPos);
+            persona.setCorreo(linea.substr(startPos, commaPos - startPos));
+            startPos = commaPos + 1;
+
+            commaPos = linea.find(',', startPos);
+            persona.setDireccion(linea.substr(startPos, commaPos - startPos));
+            startPos = commaPos + 1;
+
+            persona.setEdad(stoi(linea.substr(startPos, linea.find(',', startPos) - startPos)));
+            startPos = linea.find(',', startPos) + 1;
+
+            persona.setTelefono(linea.substr(startPos, linea.find(',', startPos) - startPos));
+            startPos = linea.find(',', startPos) + 1;
+
+            persona.setFechaNacimiento(linea.substr(startPos));
+
+            // Insertar la persona en la lista
+            insertar(persona);
         }
+
         archivo.close();
     }
 
-    void guardarEnArchivo(const std::string& nombreArchivo) {
-        std::ofstream archivo(nombreArchivo);
+    void cargarDesdeArchivoAuto(const std::string& rutaArchivo) {
+        std::ifstream archivo(rutaArchivo);
         if (!archivo.is_open()) {
-            std::cerr << "Error al abrir el archivo para guardar." << std::endl;
-            return;
+            throw std::runtime_error("No se pudo abrir el archivo: " + rutaArchivo);
         }
 
-        Nodo<T>* actual = cabeza;
-        do {
-            archivo << actual->getDato() << std::endl;  // Suponemos que T tiene un operador de salida sobrecargado
-            actual = actual->getSiguiente();
-        } while (actual != cabeza);
+        std::string linea;
+        while (getline(archivo, linea)) {
+            std::istringstream stream(linea);
+            Auto autoObj;
+
+            // Leer los atributos de Auto
+            size_t pos = linea.find(',');
+            autoObj.setPlaca(linea.substr(0, pos));
+            linea.erase(0, pos + 1);
+
+            pos = linea.find(',');
+            autoObj.setTipo(linea.substr(0, pos));
+            linea.erase(0, pos + 1);
+
+            pos = linea.find(',');
+            autoObj.setColor(linea.substr(0, pos));
+
+            // Leer los datos del conductor (Persona)
+            std::string datosConductor = linea.substr(pos + 1);
+            Persona conductor;
+
+            size_t startPos = 0;
+            size_t commaPos = datosConductor.find(',');
+
+            conductor.setNombre(datosConductor.substr(startPos, commaPos - startPos));
+            startPos = commaPos + 1;
+
+            commaPos = datosConductor.find(',', startPos);
+            conductor.setCedula(datosConductor.substr(startPos, commaPos - startPos));
+            startPos = commaPos + 1;
+
+            commaPos = datosConductor.find(',', startPos);
+            conductor.setCorreo(datosConductor.substr(startPos, commaPos - startPos));
+            startPos = commaPos + 1;
+
+            commaPos = datosConductor.find(',', startPos);
+            conductor.setDireccion(datosConductor.substr(startPos, commaPos - startPos));
+            startPos = commaPos + 1;
+
+            conductor.setEdad(stoi(datosConductor.substr(startPos, commaPos - startPos)));
+            startPos = commaPos + 1;
+
+            commaPos = datosConductor.find(',', startPos);
+            conductor.setTelefono(datosConductor.substr(startPos, commaPos - startPos));
+            startPos = commaPos + 1;
+
+            conductor.setFechaNacimiento(datosConductor.substr(startPos));
+
+            // Asignar el conductor al auto
+            autoObj.setConductor(conductor);
+
+            // Insertar el Auto en la lista
+            insertar(autoObj);
+        }
 
         archivo.close();
     }
-
     Nodo<T>* buscarPorPlaca(const std::string& placa) {
-        Nodo<T>* actual = cabeza;
-        do {
-            if (actual->getDato().getPlaca() == placa) {
-                return actual;
-            }
-            actual = actual->getSiguiente();
-        } while (actual != cabeza);
-        return nullptr;  // Si no lo encuentra
-    }
+    if (!cabeza) return nullptr; // Si la lista está vacía, no hay nada que buscar
 
-    Nodo<T>* buscarPorFecha(time_t fecha) {
-        Nodo<T>* actual = cabeza;
-        do {
-            if (actual->getDato().getIngreso() == fecha) {
-                return actual;
-            }
-            actual = actual->getSiguiente();
-        } while (actual != cabeza);
-        return nullptr;  // Si no lo encuentra
-    }
+    Nodo<T>* actual = cabeza;
+    do {
+        if (actual->getDato().getPlaca() == placa) {
+            return actual; // Devolver el nodo completo encontrado
+        }
+        actual = actual->getSiguiente();
+    } while (actual != cabeza); // Volver al inicio si no se encuentra en la lista
 
-    Nodo<T>* buscarPorPropietario(const std::string& propietario) {
-        Nodo<T>* actual = cabeza;
-        do {
-            if (actual->getDato().getPropietario().getNombre() == propietario) {
-                return actual;
-            }
-            actual = actual->siguiente;
-        } while (actual != cabeza);
-        return nullptr;  // Si no lo encuentra
-    }
+    return nullptr; // Si no se encontró ningún nodo con esa placa
+}
+
 };
 
 #endif // LISTA_DOBLE_CIRCULAR_H

@@ -37,18 +37,6 @@ public:
 
     // Método para representar el auto como una cadena
     std::string toString() const;
-
-    friend std::istream& operator>>(std::istream& is, Auto& autoObj) {
-        std::getline(is, autoObj.placa, ',');   // Lee la placa
-        std::getline(is, autoObj.tipo, ',');     // Lee el tipo de auto
-        std::getline(is, autoObj.color, ',');    // Lee el color
-
-        // Aquí debes decidir si quieres pedir también la Persona (conductor)
-        // Para este ejemplo, simplemente se omite el conductor para centrarnos en lo básico.
-        // Si deseas leer los datos del conductor, necesitarás llamar al operador >> de la clase Persona.
-
-        return is;
-    }
 };
 
 #endif // AUTO_H

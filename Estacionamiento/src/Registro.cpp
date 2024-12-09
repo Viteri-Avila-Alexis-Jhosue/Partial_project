@@ -4,149 +4,183 @@
 #include <ctime>
 #include <string>
 #include <fstream>
+#include <direct.h>
 #include <sstream>
+#include <iomanip> 
 #include "../include/Validation.h"
 #include "../include/Nodo.h"
 #include "../include/Lista_Doble_Circular.h"
 using namespace std;
-// Constructor
-Registro::Registro(std::string placa, int celda, std::string tipo, Persona propietario, std::time_t ingreso)
-    : placa(placa), celda(celda), tipo(tipo), propietario(propietario), ingreso(ingreso), salida(0) {}
-Registro::Registro()
-    : placa(""), celda(-1), tipo(""), propietario(Persona()), ingreso(0), salida(0) {
-    // Inicialización con valores por defecto
+
+Registro::Registro(std::string placa, int celda, std::string ingreso, std::string salida)
+    : placa(placa), celda(celda), ingreso(ingreso.empty() ? "00:00:00" : ingreso), salida(salida.empty() ? "00:00:00" : salida) {
+    // Validación de placa
+    if (placa.empty()) {
+        throw std::invalid_argument("La placa no puede estar vacía.");
+    }
+
+    // Validación de celda
+    if (celda < 0) {
+        throw std::invalid_argument("El número de celda debe ser un valor positivo.");
+    }
+
+    // Validación de tiempos
+    if (ingreso.empty()) {
+        throw std::invalid_argument("El tiempo de ingreso no puede estar vacío.");
+    }
+    if (!salida.empty() && salida < ingreso) { // Si la salida es no vacío, no puede ser anterior al ingreso
+        throw std::invalid_argument("El tiempo de salida no puede ser anterior al de ingreso.");
+    }
 }
+
+Registro::Registro()
+    : placa("UNKNOWN"), celda(-1), ingreso("00:00:00"), salida("00:00:00") {
+    // En este caso, la placa predeterminada es "UNKNOWN" y las fechas son "00:00:00".
+}
+
+
 // Getters y Setters
-std::string Registro::getPlaca() const { return placa; }
-void Registro::setPlaca(std::string placa) { this->placa = placa; }
+string Registro::getPlaca() const { return placa; }
+void Registro::setPlaca(std::string placa) {
+    if (placa.empty()) {
+        throw std::logic_error("La placa no puede estar vacía");
+    }
+    this->placa = placa;
+}
 
 int Registro::getCelda() const { return celda; }
 void Registro::setCelda(int celda) { this->celda = celda; }
 
-std::string Registro::getTipo() const { return tipo; }
-void Registro::setTipo(std::string tipo) { this->tipo = tipo; }
+string Registro::getIngreso() const { return ingreso; }
+void Registro::setIngreso(std::string ingreso) { this->ingreso = ingreso; }
 
-Persona Registro::getPropietario() const { return propietario; }
-void Registro::setPropietario(Persona propietario) { this->propietario = propietario; }
+string Registro::getSalida() const { return salida; }
+void Registro::setSalida(std::string salida) { this->salida = salida; }
 
-std::time_t Registro::getIngreso() const { return ingreso; }
-void Registro::setIngreso(std::time_t ingreso) { this->ingreso = ingreso; }
-
-std::time_t Registro::getSalida() const { return salida; }
-void Registro::setSalida(std::time_t salida) { this->salida = salida; }
-
-Auto Registro::registrar_por_primera_vez(){
+Auto Registro::registrar_por_primera_vez() {
     Auto auto1;
     Validation validation1;
-    string placa, tipo, color,nombre,correo,direccion,fecha_nacimiento, telefono;
-    int cedula, edad,dian,mesn,anion;
+    string placa, tipo, color, nombre, correo, direccion, fecha_nacimiento, telefono, cedula;
+    int edad, dian, mesn, anion;
     Persona persona1;
-    do{
-    printf("Ingrese una placa:\t");
-    cin>>placa;
-    if(!auto1.validarPlaca(placa)){
-        printf("!!!!!!ERROR!!!!!! PLACA INCORRECA!!!!!!!!\n");
+    Lista_Doble_Circular<Auto> lista_auto;  // Lista para cargar autos registrados
+
+    // Obtener la ruta del archivo sin usar std::filesystem
+    char buffer[FILENAME_MAX];
+    string ruta_autos;
+    if (_getcwd(buffer, FILENAME_MAX)) { // Obtiene el directorio actual
+        ruta_autos = string(buffer) + "\\output\\Autos.txt"; // Ruta para Windows
+    } else {
+        ruta_autos = "output/Autos.txt"; // Ruta por defecto en caso de error
     }
-    }while(!auto1.validarPlaca(placa));
-    printf("Ingrese el tipo de vehiculo:\t");
-    cin>>tipo;
-    color=validation1.ingresarStringConEspacios("Ingrese el color de vehiculo:\t");
-    printf("\n\t\tDatos del propietario:\t");
-    nombre=validation1.ingresarStringConEspacios("\nNombre y Apellido:\t");
+
+    lista_auto.cargarDesdeArchivoAuto(ruta_autos);
+
     do {
-        cedula=validation1.ingresarInt("\nCedula:\t");
-        try {
-            validation1.validateId(cedula);  // Llama a la función de validación
-            break;  // Si la cédula es válida, rompe el ciclo
-        } catch (const invalid_argument& e) {
-            cout << e.what() << endl;  // Imprime el mensaje de error si la cédula no es válida
+        cout << "Ingrese una placa: ";
+        cin >> placa;
+        if (!auto1.validarPlaca(placa)) {
+            cout << "!!!!!!ERROR!!!!!! PLACA INCORRECTA!!!!!!!!" << endl;
+        } else {
+            // Verificar si la placa ya está registrada
+            Nodo<Auto>* autoExistente = lista_auto.buscarPorPlaca(placa);
+            if (autoExistente) {
+                cout << "!!!!!!ERROR!!!!!! LA PLACA YA ESTA REGISTRADA!!!!!!!!" << endl;
+                continue;  // Solicitar nuevamente la placa
+            } else {
+                break;  // Placa válida y no registrada
+            }
         }
     } while (true);
+
+    cout << "Ingrese el tipo de vehiculo: ";
+    cin >> tipo;
+    color = validation1.ingresarStringConEspacios("Ingrese el color de vehiculo: ");
+    
+    cout << "\n\t\tDatos del propietario:\t";
+    nombre = validation1.ingresarStringConEspacios("\nNombre y Apellido: ");
+    
+        cedula = validation1.ingresarInt("\nCedula: ");
     do {
-        printf("\nCorreo electronico:\t");
+        cout << "\nCorreo electronico: ";
         cin >> correo;
-        fflush(stdin);
         try {
             validation1.validateEmail(correo);  // Llama a la función de validación de correo
-            break;  // Si el correo es válido, rompe el ciclo
+            break;
         } catch (const invalid_argument& e) {
-            cout << e.what() << endl;  // Imprime el mensaje de error si el correo no es válido
+            cout << e.what() << endl;
         }
     } while (true);
+
     do {
-    printf("Numero de telefono\t");
-    cin >> telefono;  // Captura el número ingresado
-    fflush(stdin);
-    try {
-        validation1.validateCellPhone(telefono);  // Validación del formato de teléfono
-        break;  // Si el teléfono es válido, salimos del ciclo
-    } catch (const invalid_argument& e) {
-        cout << e.what() << endl;  // Imprime el mensaje de error si el teléfono no es válido
-    }
-} while (true);
+        cout << "Numero de telefono: ";
+        cin >> telefono;
+        try {
+            validation1.validateCellPhone(telefono);  // Validación del formato de teléfono
+            break;
+        } catch (const invalid_argument& e) {
+            cout << e.what() << endl;
+        }
+    } while (true);
 
-
-    printf("Direccion:\t");
-    cin>>direccion;
-    fflush(stdin);
-    printf("Ingrese la fecha de nacimiento:");
+    cout << "Direccion: ";
+    cin >> direccion;
+    
+    cout << "Ingrese la fecha de nacimiento: ";
     time_t t = time(0);
     struct tm *now = localtime(&t);
     int anioActual = (now->tm_year + 1900);
+
     do {
-        anion = validation1.ingresarInt("\nAnio:\t");
+        anion = validation1.ingresarInt("\nAnio: ");
         if (anion < anioActual - 200 || anion > anioActual) {
-            cout << "Anio invalido.";
+            cout << "Anio invalido." << endl;
         } else {
             break;
         }
     } while (true);
 
-    // Validar mes
     do {
-        mesn = validation1.ingresarInt("\nMes:\t");
+        mesn = validation1.ingresarInt("\nMes: ");
         if (mesn < 1 || mesn > 12) {
-            cout << "Mes invalido.";
+            cout << "Mes invalido." << endl;
         } else {
             break;
         }
     } while (true);
 
-    // Validar día
     do {
-        dian = validation1.ingresarInt("\nDia:\t");
+        dian = validation1.ingresarInt("\nDia: ");
         bool esBisiesto = (anion % 4 == 0 && anion % 100 != 0) || (anion % 400 == 0);
-        int maxDias;
-
-        if (mesn == 2) {
-            maxDias = esBisiesto ? 29 : 28;
-        } else if (mesn == 4 || mesn == 6 || mesn == 9 || mesn == 11) {
-            maxDias = 30;
-        } else {
-            maxDias = 31;
-        }
-
+        int maxDias = (mesn == 2) ? (esBisiesto ? 29 : 28) :
+                      ((mesn == 4 || mesn == 6 || mesn == 9 || mesn == 11) ? 30 : 31);
+        
         if (dian < 1 || dian > maxDias) {
-            cout << "Dia invalido";
+            cout << "Dia invalido" << endl;
         } else {
             break;
         }
     } while (true);
+
     fecha_nacimiento = to_string(anion) + "-" + to_string(mesn) + "-" + to_string(dian);
     edad = persona1.calcularEdad(fecha_nacimiento);
     persona1 = Persona(nombre, cedula, correo, direccion, telefono, fecha_nacimiento);
-    Auto auto2(placa,persona1,tipo,color);
-    printf("\nAuto registrado correctamente");
+    Auto auto2(placa, persona1, tipo, color);
+    
+    cout << "\nAuto registrado correctamente." << endl;
     return auto2;
-
 }
+
 void Registro::registrar_ingreso(Auto auto1) {
     // Obtener la fecha y hora de ingreso
-    std::time_t now = std::time(0);
-    this->ingreso = now;
+    time_t now = time(0);
+    struct tm* now_tm = localtime(&now);
+    char buffer[100];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", now_tm);
+    this->ingreso = std::string(buffer);
 
     // Guardar la información en un archivo Historial.txt
-    std::ofstream archivo("/output/Historial.txt", std::ios::app);
+    std::ofstream archivo("output/Historial.txt", std::ios::app);
     if (archivo.is_open()) {
         archivo << toString() << "\n\n";  // Llamamos a toString para obtener el formato adecuado
         archivo.close();
@@ -154,25 +188,32 @@ void Registro::registrar_ingreso(Auto auto1) {
         cout << "Error al abrir el archivo de historial." << endl;
     }
 }
+
 void Registro::registrar_salida(Auto auto1) {
-    printf("Hola");
+    // Obtener la fecha y hora de salida
+    time_t now = time(0);
+    struct tm* now_tm = localtime(&now);
+    char buffer[100];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", now_tm);
+    this->salida = std::string(buffer);
+
+    // Actualizar el historial con la salida
+    std::ofstream archivo("output/Historial.txt", std::ios::app);
+    if (archivo.is_open()) {
+        archivo << toString() << "\n\n";  // Llamamos a toString para obtener el formato adecuado
+        archivo.close();
+    } else {
+        cout << "Error al abrir el archivo de historial." << endl;
+    }
 }
 
-
-std::string Registro::toString() const {
-    // Convertir las fechas a formato legible
-    char bufferIngreso[100];
-    char bufferSalida[100];
-    strftime(bufferIngreso, sizeof(bufferIngreso), "%Y-%m-%d %H:%M:%S", localtime(&ingreso));
-    strftime(bufferSalida, sizeof(bufferSalida), "%Y-%m-%d %H:%M:%S", localtime(&salida));
-
+string Registro::toString() const {
+    // Mostrar las fechas de ingreso y salida (ya son cadenas)
     std::ostringstream os;
     os << "Placa: " << placa << "\n"
        << "Celda: " << celda << "\n"
-       << "Tipo: " << tipo << "\n"
-       << "Propietario: " << propietario.toString() << "\n"  // Asumiendo que `Persona` tiene `toString()`
-       << "Ingreso: " << bufferIngreso << "\n"
-       << "Salida: " << (salida == 0 ? "No ha salido" : bufferSalida);
-    
+       << "Ingreso: " << ingreso << "\n"
+       << "Salida: " << (salida.empty() ? "No ha salido" : salida);
+
     return os.str();
 }
