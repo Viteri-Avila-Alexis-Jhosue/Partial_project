@@ -1,38 +1,28 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "cppbuild",
-			"label": "Compilar Proyecto g++",
-			"command": "C:\\MinGW\\bin\\g++.exe",
-			"args": [
-				"-fdiagnostics-color=always",
-				"-g",
-				"-I", "${workspaceFolder}/include",   // Ruta a los archivos .h
-				"${workspaceFolder}/src/*.cpp",      // Compilar todos los .cpp de src
-				"-o", "${workspaceFolder}/output/main.exe" // Generar el ejecutable en output
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"detail": "Compilador: C:\\MinGW\\bin\\g++.exe"
-		},
-		{
-			"label": "Ejecutar Proyecto g++",
-			"command": "${workspaceFolder}/output/main.exe",
-			"dependsOn": "Compilar Proyecto g++",
-			"problemMatcher": [],
-			"group": {
-				"kind": "build",
-				"isDefault": false
-			}
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Compilar Proyecto g++",
+            "command": "C:\\MinGW\\bin\\g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-I", "./include",
+                "./src/*.cpp",
+                "-o", "./output/main.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Compilador: C:\\MinGW\\bin\\g++.exe"
+        }
+    ]
 }

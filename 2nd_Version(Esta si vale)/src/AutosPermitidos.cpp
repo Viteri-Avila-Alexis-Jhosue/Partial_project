@@ -167,7 +167,7 @@ void AutosPermitidos::mostrarAutoPorPlaca(const string& placa) const {
     }
 
     if (!encontrado) {
-        cout << "No se encontró un auto con la placa " << placa << "." << endl;
+        cout << "\nNo se encontro un auto con la placa " << placa << "." << endl;
     }
 }
 Auto AutosPermitidos::devolverAuto(const std::string& placa) const {
@@ -177,6 +177,6 @@ Auto AutosPermitidos::devolverAuto(const std::string& placa) const {
         }
     }
 
-    cerr << "No se encontró un auto con la placa " << placa << "." << endl;
+    cerr << "\nNo se encontro un auto con la placa " << placa << "." << endl;
     return Auto("", "", "");  // Devolvemos un objeto Auto vacío si no se encuentra
 }
